@@ -1,0 +1,123 @@
+import re
+
+# Single Responsibility Principle: The RequisitionSystem class is responsible for handling the main logic of the requisition system, and each method focuses on a specific task.
+class RequisitionSystem:
+    # Class variable used to generate a unique requisition ID
+    counter = 0
+
+    def __init__(self):
+        # Initialize the attributes of the requisition system
+        self.date = None
+        self.staff_id = None
+        self.staff_name = None
+        self.requisition_id = None
+        self.items = {}
+        self.total = 0
+        # Initial status is pending
+        self.status = "Pending"
+        self.approval_ref = None
+
+    # Method to collect staff information
+    def collect_staff_info(self):
+        # Loop to get the date until the input format is correct
+        while True:
+            self.date = input("Enter the date (format: MM/DD/YYYY): ")
+            # Use regular expressions to validate the date format
+            if re.match(r'^\d{2}/\d{2}/\d{4}$', self.date):
+                break
+            else:
+                print("Invalid date format. Please use MM/DD/YYYY.")
+
+        # Loop to get the staff ID until the input is not empty
+        while True:
+            self.staff_id = input("Enter the staff ID: ")
+            if self.staff_id.strip():
+                break
+            else:
+                print("Staff ID cannot be empty.")
+
+        # Loop to get the staff name until the input is not empty
+        while True:
+            self.staff_name = input("Enter the staff name: ")
+            if self.staff_name.strip():
+                break
+            else:
+                print("Staff name cannot be empty.")
+
+        # Increment the requisition counter
+        RequisitionSystem.counter += 1
+        # Generate a unique requisition ID
+        self.requisition_id = 10000 + RequisitionSystem.counter
+        print("Printing Staff Information:")
+        print(f"Date: {self.date}")
+        print(f"Staff ID: {self.staff_id}")
+        print(f"Staff Name: {self.staff_name}")
+        print(f"Requisition ID: {self.requisition_id}")
+
+    # Method to collect requisition item information
+    def collect_requisition_items(self):
+        print("Enter the requisition items (format: Item Name $Price). Press Enter on an empty line to finish.")
+        while True:
+            item = input()
+            if not item:
+                break
+            # Use regular expressions to validate the input format
+            match = re.match(r'^([^$]+)\s*\$(\d+(\.\d+)?)$', item)
+            if match:
+                # Extract the item name
+                item_name = match.group(1).strip()
+                # Extract the item price
+                price = float(match.group(2))
+                self.items[item_name] = price
+                # Calculate the total price
+                self.total += price
+            else:
+                print("Invalid input format. Please use 'Item Name $Price'.")
+        print(f"Total: ${self.total:.2f}")
+
+    # Method to approve the requisition
+    def approve_requisition(self):
+        # If the total price is less than 500, the requisition is approved
+        if self.total < 500:
+            self.status = "Approved"
+            # Generate an approval reference number
+            self.approval_ref = f"{self.staff_id}{str(self.requisition_id)[-3:]}"
+        print(f"Total: ${self.total:.2f}")
+        print(f"Status: {self.status}")
+        if self.approval_ref:
+            print(f"Approval Reference Number: {self.approval_ref}")
+
+    # Method to display requisition information
+    def display_requisition(self):
+        print("Printing Requisitions:")
+        print(f"Date: {self.date}")
+        print(f"Requisition ID: {self.requisition_id}")
+        print(f"Staff ID: {self.staff_id}")
+        print(f"Staff Name: {self.staff_name}")
+        print(f"Total: ${self.total:.2f}")
+        print(f"Status: {self.status}")
+
+        if self.approval_ref:
+            print(f"Approval Reference Number: {self.approval_ref}")
+
+
+if __name__ == "__main__":
+    while True:
+        # Create an instance of the requisition system
+        requisition = RequisitionSystem()
+        # Collect staff information
+        requisition.collect_staff_info()
+        # Collect requisition item information
+        requisition.collect_requisition_items()
+        # Approve the requisition
+        requisition.approve_requisition()
+        # Display requisition information
+        requisition.display_requisition()
+        while True:
+            choice = input("Do you want to submit another requisition? (yes/no): ").strip().lower()
+            if choice in ['yes', 'no']:
+                break
+            else:
+                print("Invalid input. Please enter 'yes' or 'no'.")
+        if choice == 'no':
+            break
